@@ -1,0 +1,27 @@
+@import "tailwindcss";
+
+/* ── Brand & accessibility tokens (STARTING values — not locked) ──
+   - Success scales: single-hue SEQUENTIAL ramp (lightness = value), colour-blind-safe
+   - Categoricals (reward tiers): colour-blind-safe palette + never colour-only
+   - Zone diagram: pattern + colour redundancy
+   Replace with final choices once picked. */
+@theme {
+  /* Brand (placeholder orange/brown — adjust) */
+  --color-brand-orange: #e2923a;
+  --color-brand-brown:  #3b322f;
+
+  /* Success — single-hue sequential ramp, pale → saturated */
+  --color-success-0: #f7ede0;
+  --color-success-1: #f0d3a8;
+  --color-success-2: #e6b56e;
+  --color-success-3: #d9933a;
+  --color-success-4: #b8701e;
+
+  /* No-session marker (distinct from any success value) */
+  --color-no-session: #e7e3df;
+
+  /* Reward tiers — Okabe–Ito starting values */
+  --color-tier-none:    #999999;
+  --color-tier-reward:  #e69f00;
+  --color-tier-jackpot: #0072b2;
+}
