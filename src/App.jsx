@@ -2,6 +2,8 @@ import { useState } from 'react'
 
 import ZoneDiagram, { EMPTY_PAWS } from './components/ZoneDiagram'
 
+import CriteriaEditor from './components/CriteriaEditor'
+
 function clonePaws(paws) {
   return {
     FR: paws?.FR ?? null,
@@ -121,6 +123,11 @@ export default function App() {
   )
 
   // ── SUMMARY SCREEN ──────────────────────────────
+  if (view === 'criteria') {
+    return <CriteriaEditor onBack={() => setView('logging')} />
+  }
+
+  
   if (view === 'summary') {
     return (
       <Frame>
@@ -161,6 +168,9 @@ export default function App() {
             ? 'Paws and reward update this rep'
             : `${total} reps · ${successRate}% rewarded · ${misses} missed`}
         </p>
+        <button onClick={() => setView('criteria')} className="text-brand-orange text-xs underline block mx-auto mt-1">
+          Criteria (temp)
+        </button>
       </header>
 
       {/* Scrolling middle — the rep list (the zone diagram will live here next) */}
