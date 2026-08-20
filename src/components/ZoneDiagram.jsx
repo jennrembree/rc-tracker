@@ -1,5 +1,7 @@
 import { useRef, useState } from 'react'
 
+export const EMPTY_PAWS = { FR: null, FL: null, HR: null, HL: null }
+
 const PAW_IDS = ['FR', 'FL', 'HR', 'HL']
 
 function clientToSvg(svg, clientX, clientY) {
@@ -26,10 +28,9 @@ function TrayPaw({ label }) {
   )
 }
 
-export default function ZoneDiagram() {
+export default function ZoneDiagram({ paws, onPawsChange }) {
   const svgRef = useRef(null)
   const dragRef = useRef(null)
-  const [paws, setPaws] = useState({ FR: null, FL: null, HR: null, HL: null })
   const [drag, setDrag] = useState(null)
 
   function startDrag(id, e) {
@@ -69,10 +70,10 @@ export default function ZoneDiagram() {
     const d = dragRef.current
     if (!d || (e.pointerId != null && e.pointerId !== d.pointerId)) return
     const { x, y, inside } = clientToSvg(svgRef.current, e.clientX, e.clientY)
-    setPaws((prev) => ({
-      ...prev,
+    onPawsChange({
+      ...paws,
       [d.id]: inside ? { x, y } : d.origin,
-    }))
+    })
     dragRef.current = null
     setDrag(null)
   }
