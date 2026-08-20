@@ -3,19 +3,17 @@ import { useRef, useState } from 'react'
 export const EMPTY_PAWS = { FR: null, FL: null, HR: null, HL: null }
 
 const PAW_IDS = ['FR', 'FL', 'HR', 'HL']
+const CANVAS_W = 200
+const CANVAS_H = 310
 
 function clientToSvg(svg, clientX, clientY) {
   const rect = svg.getBoundingClientRect()
-  const x = ((clientX - rect.left) / rect.width) * 200
-  const y = ((clientY - rect.top) / rect.height) * 260
-  const inside =
-    clientX >= rect.left &&
-    clientX <= rect.right &&
-    clientY >= rect.top &&
-    clientY <= rect.bottom
+  const x = ((clientX - rect.left) / rect.width) * CANVAS_W
+  const y = ((clientY - rect.top) / rect.height) * CANVAS_H
+  const inside = x >= 0 && x <= CANVAS_W && y >= 0 && y <= CANVAS_H
   return {
-    x: Math.min(200, Math.max(0, x)),
-    y: Math.min(260, Math.max(0, y)),
+    x: Math.min(CANVAS_W, Math.max(0, x)),
+    y: Math.min(CANVAS_H, Math.max(0, y)),
     inside,
   }
 }
@@ -98,8 +96,8 @@ export default function ZoneDiagram({ paws, onPawsChange }) {
     <div className="flex flex-col items-center py-4">
       <svg
         ref={svgRef}
-        viewBox="0 0 200 260"
-        className="w-40 h-52 touch-none"
+        viewBox={`0 0 ${CANVAS_W} ${CANVAS_H}`}
+        className="w-40 h-60 touch-none"
         role="img"
         aria-label="Contact zone diagram — drag paws from the tray to place them"
       >
@@ -107,6 +105,13 @@ export default function ZoneDiagram({ paws, onPawsChange }) {
         <rect x="20" y="120" width="160" height="130" fill="none" stroke="#b8621a" strokeWidth="4" />
         <rect x="20" y="152.5" width="160" height="97.5" fill="none" stroke="#4caf50" strokeWidth="3" />
         <rect x="20" y="164.7" width="160" height="85.3" fill="#4caf50" fillOpacity="0.35" stroke="#4caf50" strokeWidth="1" />
+
+        {/* Ground just past the end of the contact — for a paw landed after the plank */}
+        <rect x="20" y="256" width="160" height="48" rx="4"
+          fill="#ffffff" fillOpacity="0.06" stroke="#ffffff" strokeOpacity="0.25"
+          strokeWidth="2" strokeDasharray="4 4" />
+        <text x="100" y="284" textAnchor="middle" fontSize="9" fill="#ffffff" fillOpacity="0.5"
+          className="select-none pointer-events-none">ground</text>
 
         {PAW_IDS.map((id) => {
           const pos = posFor(id)
