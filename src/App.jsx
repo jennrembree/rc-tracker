@@ -1,3 +1,5 @@
+import DogsTest from './components/DogsTest'
+
 import { useState } from 'react'
 
 import ZoneDiagram, { EMPTY_PAWS } from './components/ZoneDiagram'
@@ -14,6 +16,7 @@ function clonePaws(paws) {
 }
 
 export default function App() {
+  return <DogsTest />
   const [blocks, setBlocks] = useState([{ id: 1, reps: [] }])
   const [view, setView] = useState('logging')
   const [missNext, setMissNext] = useState(false)
