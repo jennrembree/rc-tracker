@@ -1,27 +1,25 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 
-export default function DogsTest() {
+export default function DogsTest({ onBack }) {
   const [dogs, setDogs] = useState([])
   const [name, setName] = useState('')
   const [status, setStatus] = useState('')
 
-  // Load all dogs from the database when the screen first appears.
   async function loadDogs() {
     const { data, error } = await supabase.from('dogs').select('*').order('created_at')
     if (error) setStatus('Load error: ' + error.message)
     else setDogs(data)
   }
 
-  useEffect(() => {
-    loadDogs()
-  }, [])
+  useEffect(() => { loadDogs() }, [])
 
-  // Save a new dog to the database, then reload the list.
   async function addDog() {
     if (!name.trim()) return
     setStatus('Saving…')
-    const { error } = await supabase.from('dogs').insert({ name: name.trim() })
+    // Get the currently logged-in user, so we can stamp the dog as theirs.
+    const { data: { user } } = await supabase.auth.getUser()
+    const { error } = await supabase.from('dogs').insert({ name: name.trim(), user_id: user.id })
     if (error) {
       setStatus('Save error: ' + error.message)
     } else {
@@ -33,22 +31,18 @@ export default function DogsTest() {
 
   return (
     <div className="min-h-screen bg-brand-brown text-white flex flex-col items-center gap-4 p-6">
+      <button onClick={onBack} className="self-start text-brand-orange text-sm underline">← Back</button>
       <h1 className="text-2xl font-bold">Dogs (database test)</h1>
-
       <div className="flex gap-2">
         <input
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="Dog's name"
-          className="px-3 py-2 rounded-lg text-brand-brown"
+          className="px-3 py-2 rounded-lg w-48 bg-white text-brand-brown placeholder-brand-brown/50 border-2 border-brand-orange"
         />
-        <button onClick={addDog} className="px-4 py-2 rounded-lg bg-brand-orange text-brand-brown font-bold">
-          Add
-        </button>
+        <button onClick={addDog} className="px-4 py-2 rounded-lg bg-brand-orange text-brand-brown font-bold">Add</button>
       </div>
-
       {status && <p className="text-sm text-brand-orange">{status}</p>}
-
       <div className="w-full max-w-xs mt-2">
         {dogs.map((dog) => (
           <div key={dog.id} className="py-2 border-b border-white/10">{dog.name}</div>

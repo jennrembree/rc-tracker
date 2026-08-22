@@ -3,6 +3,7 @@ import { supabase } from './lib/supabase'
 import ZoneDiagram, { EMPTY_PAWS } from './components/ZoneDiagram'
 import CriteriaEditor from './components/CriteriaEditor'
 import AuthTest from './components/AuthTest'
+import DogsTest from './components/DogsTest'
 
 export default function App() {
   // ── AUTH GATE (new) ─────────────────────────────
@@ -121,6 +122,10 @@ function LoggingApp({ onLogOut, userEmail }) {
     return <CriteriaEditor onBack={() => setView('logging')} />
   }
 
+  if (view === 'dogs') {
+    return <DogsTest onBack={() => setView('logging')} />
+  }
+
   if (view === 'summary') {
     return (
       <Frame>
@@ -159,6 +164,7 @@ function LoggingApp({ onLogOut, userEmail }) {
         </p>
         <div className="flex justify-center gap-3 mt-1">
           <button onClick={() => setView('criteria')} className="text-brand-orange text-xs underline">Criteria (temp)</button>
+          <button onClick={() => setView('dogs')} className="text-brand-orange text-xs underline">Dogs (temp)</button>
           <button onClick={onLogOut} className="text-white/50 text-xs underline">Log out ({userEmail})</button>
         </div>
       </header>
