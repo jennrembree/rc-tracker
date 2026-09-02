@@ -1,3 +1,4 @@
+import StartSession from './components/StartSession'
 import { useState, useEffect } from 'react'
 import { supabase } from './lib/supabase'
 import ZoneDiagram, { EMPTY_PAWS } from './components/ZoneDiagram'
@@ -6,6 +7,7 @@ import AuthTest from './components/AuthTest'
 import DogsTest from './components/DogsTest'
 import { saveSession } from './lib/saveSession'
 import SessionHistory from './components/SessionHistory'
+
 
 export default function App() {
   // ── AUTH GATE (new) ─────────────────────────────
@@ -48,8 +50,9 @@ export default function App() {
 // Your existing app, now a logged-in-only component.
 function LoggingApp({ onLogOut, userEmail }) {
   const [blocks, setBlocks] = useState([{ id: 1, reps: [] }])
-  const [view, setView] = useState('logging')
+  const [view, setView] = useState('start')
   const [missNext, setMissNext] = useState(false)
+  const [sessionInfo, setSessionInfo] = useState(null) // { dogId, obstacle } once a session starts  
   const [selected, setSelected] = useState(null)
   const [currentPaws, setCurrentPaws] = useState(EMPTY_PAWS)
 
@@ -58,13 +61,9 @@ function LoggingApp({ onLogOut, userEmail }) {
 
   const [dogId, setDogId] = useState(null)
   const [saveStatus, setSaveStatus] = useState('')
+  
 
-  useEffect(() => {
-    // Grab the user's first dog to attach sessions to (temporary — real picker later).
-    supabase.from('dogs').select('id').limit(1).single().then(({ data }) => {
-      if (data) setDogId(data.id)
-    })
-  }, [])
+
 
   function logRep(reward) {
     if (isEditing) {
@@ -112,7 +111,7 @@ function LoggingApp({ onLogOut, userEmail }) {
     setMissNext(false)
     setSelected(null)
     setCurrentPaws(EMPTY_PAWS)
-    setView('logging')
+    setView('start')
   }
 
   const allReps = blocks.flatMap((b) => b.reps)
@@ -129,6 +128,18 @@ function LoggingApp({ onLogOut, userEmail }) {
       </div>
     </div>
   )
+
+  if (view === 'start') {
+    return (
+      <StartSession
+        onStart={(info) => {
+          setSessionInfo(info)
+          setBlocks([{ id: 1, reps: [] }]) // fresh session
+          setView('logging')
+        }}
+      />
+    )
+  }
 
   if (view === 'criteria') {
     return <CriteriaEditor onBack={() => setView('logging')} />
@@ -237,12 +248,12 @@ function LoggingApp({ onLogOut, userEmail }) {
             <button
               onClick={async () => {
                 setSaveStatus('Saving…')
-                const { error } = await saveSession(blocks, { dogId, obstacle: 'dogwalk' })
+                const { error } = await saveSession(blocks, sessionInfo)
                 if (error) { setSaveStatus('Save error: ' + error.message); return }
                 setSaveStatus('')
                 setView('summary')
               }}
-              disabled={total === 0 || !dogId}
+              disabled={total === 0}
               className="text-white underline disabled:opacity-30"
             >
               End session

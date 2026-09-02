@@ -16,8 +16,8 @@ export default function SessionHistory({ onBack }) {
     const { data, error } = await supabase
       .from('sessions')
       .select('id, date, obstacle, blocks(reps(reward_given, missed))')
-      .order('date', { ascending: false })
-
+      .order('created_at', { ascending: false })
+      
     if (error) {
       setError(error.message)
     } else {
