@@ -4,6 +4,7 @@ import ZoneDiagram, { EMPTY_PAWS } from './components/ZoneDiagram'
 import CriteriaEditor from './components/CriteriaEditor'
 import AuthTest from './components/AuthTest'
 import DogsTest from './components/DogsTest'
+import { saveSession } from './lib/saveSession'
 
 export default function App() {
   // ── AUTH GATE (new) ─────────────────────────────
@@ -53,6 +54,16 @@ function LoggingApp({ onLogOut, userEmail }) {
 
   const currentBlock = blocks[blocks.length - 1]
   const isEditing = selected !== null
+
+  const [dogId, setDogId] = useState(null)
+  const [saveStatus, setSaveStatus] = useState('')
+
+  useEffect(() => {
+    // Grab the user's first dog to attach sessions to (temporary — real picker later).
+    supabase.from('dogs').select('id').limit(1).single().then(({ data }) => {
+      if (data) setDogId(data.id)
+    })
+  }, [])
 
   function logRep(reward) {
     if (isEditing) {
@@ -167,6 +178,7 @@ function LoggingApp({ onLogOut, userEmail }) {
           <button onClick={() => setView('dogs')} className="text-brand-orange text-xs underline">Dogs (temp)</button>
           <button onClick={onLogOut} className="text-white/50 text-xs underline">Log out ({userEmail})</button>
         </div>
+        {saveStatus && <p className="text-brand-orange text-xs mt-1">{saveStatus}</p>}
       </header>
 
       <main className="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
@@ -216,7 +228,19 @@ function LoggingApp({ onLogOut, userEmail }) {
           <div className="flex justify-between text-sm pt-1">
             <button onClick={undo} disabled={currentBlock.reps.length === 0} className="text-white/50 underline disabled:opacity-30">Undo</button>
             <button onClick={newBlock} className="text-brand-orange underline">+ New block</button>
-            <button onClick={() => setView('summary')} disabled={total === 0} className="text-white underline disabled:opacity-30">End session</button>
+            <button
+              onClick={async () => {
+                setSaveStatus('Saving…')
+                const { error } = await saveSession(blocks, { dogId, obstacle: 'dogwalk' })
+                if (error) { setSaveStatus('Save error: ' + error.message); return }
+                setSaveStatus('')
+                setView('summary')
+              }}
+              disabled={total === 0 || !dogId}
+              className="text-white underline disabled:opacity-30"
+            >
+              End session
+            </button>
           </div>
         )}
       </footer>
