@@ -5,6 +5,7 @@ import CriteriaEditor from './components/CriteriaEditor'
 import AuthTest from './components/AuthTest'
 import DogsTest from './components/DogsTest'
 import { saveSession } from './lib/saveSession'
+import SessionHistory from './components/SessionHistory'
 
 export default function App() {
   // ── AUTH GATE (new) ─────────────────────────────
@@ -137,6 +138,10 @@ function LoggingApp({ onLogOut, userEmail }) {
     return <DogsTest onBack={() => setView('logging')} />
   }
 
+  if (view === 'history') {
+    return <SessionHistory onBack={() => setView('logging')} />
+  }
+
   if (view === 'summary') {
     return (
       <Frame>
@@ -177,6 +182,7 @@ function LoggingApp({ onLogOut, userEmail }) {
           <button onClick={() => setView('criteria')} className="text-brand-orange text-xs underline">Criteria (temp)</button>
           <button onClick={() => setView('dogs')} className="text-brand-orange text-xs underline">Dogs (temp)</button>
           <button onClick={onLogOut} className="text-white/50 text-xs underline">Log out ({userEmail})</button>
+          <button onClick={() => setView('history')} className="text-brand-orange text-xs underline">History (temp)</button>
         </div>
         {saveStatus && <p className="text-brand-orange text-xs mt-1">{saveStatus}</p>}
       </header>
